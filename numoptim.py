@@ -73,9 +73,9 @@ def goldstein_conditions(fun, d, x, fx, gx, rho=0.5, alpha_in=1.0, maxback=30):
 
 def steepest_descent(fun, x, gradfun, tol=1e-10, maxit=50000):
 
-	operator = input("Choose stepsize selection criterion:\n 1. Armijo\n 2. Wolfe\n 3. StrongWolfe\n 4. Goldstein\n Input name: ")
-	print(operator)
-	"""
+    operator = input("Choose stepsize selection criterion:\n 1. Armijo\n 2. Wolfe\n 3. StrongWolfe\n 4. Goldstein\n 5. Polynomial-Armijo\n Input name: ")
+    print(operator)
+    """
 	Parameters
 	----------
 		fun:callable
@@ -102,21 +102,85 @@ def steepest_descent(fun, x, gradfun, tol=1e-10, maxit=50000):
 
 
 
-	it = 0
-	grad_norm = np.linalg.norm(gradfun(x))
-	while grad_norm>tol and it<=maxit:
-		d = -gradfun(x)
-		fx = fun(x)
-		if operator == 'Armijo':
-			alpha = armijo_backtrack(fun,d,x,fx,-d)
-		elif operator == 'Wolfe':
-			alpha = wolfe_conditions(fun,d,x,fx,-d, gradfun)
-		elif operator == 'StrongWolfe':
-			alpha = strongWolfe_conditions(fun,d,x,fx,-d, gradfun)
-		elif operator == 'Goldstein':
-			alpha = goldstein_conditions(fun,d,x,fx,-d)
+    it = 0
+    grad_norm = np.linalg.norm(gradfun(x))
+    while grad_norm>tol and it<=maxit:
+        d = -gradfun(x)
+        fx = fun(x)
+        if operator == 'Armijo':
+            alpha = armijo_backtrack(fun,d,x,fx,-d)
+        elif operator == 'Wolfe':
+            alpha = wolfe_conditions(fun,d,x,fx,-d, gradfun)
+        elif operator == 'StrongWolfe':
+            alpha = strongWolfe_conditions(fun,d,x,fx,-d, gradfun)
+        elif operator == 'Goldstein':
+            alpha = goldstein_conditions(fun,d,x,fx,-d)
+        elif operator == 'Polynomial-Armijo':
+            alpha = polynomial_armijo(fun,d,x,fx,-d, gradfun)
 
-		x = x + alpha*d
-		grad_norm = np.linalg.norm(gradfun(x))
-		it = it + 1
-	return x,grad_norm,it
+        x = x + alpha*d
+        grad_norm = np.linalg.norm(gradfun(x))
+        it = it + 1
+        #print("x		: {}" .format(x))
+    return x,grad_norm,it
+
+def polynomial_armijo(fun, d, x, fx, gx, g, c1=1e-4, rholo=0.1, rhohi=0.5, alpha_in=1.0, tol=1e-10, maxpol=30):
+    """
+	Parameters
+	----------
+		d:array
+		  current direction
+		x:array
+		  current point
+		fx:float
+		  function value at x
+		gx:array
+		  gradient at x
+		c1:float
+		  armijo parameter (default value is 1e-4)
+		rho:float 
+		  backtracking parameter (default value is 0.5)
+		alpha_in:float
+		  initial step length (default value is 1.0) 
+		maxback:int 
+			max number of backtracking iterations (default is 30)
+
+	Returns
+	-------
+		float
+			steplength satisfying the Armijo rule or the last steplength
+	"""
+    alpha = alpha_in
+    q = np.dot(gx, d)
+    fj = fun(x + alpha*d)
+    j = 0
+    alphatemp = alpha
+    ftemp = fj
+    
+    while fj > fx+c1*alpha*q and j <= maxpol:
+        
+        if j == 0:
+            alphastar = -((q)*alpha**2)/(2*(fj-fx-(alpha*q)))
+            
+        else:
+            A = np.array([[np.float64(alphatemp**2), np.float64(alphatemp**3)],[np.float64(alpha**2), np.float64(alpha**3)]])
+            B = np.array([(np.float64(ftemp-fx-(alphatemp*q))),(np.float64(fj-fx-(alpha*q)))])
+            
+            #A = np.float64(A)
+            #B = np.float64(B)
+            
+            C = np.linalg.solve(A,B)
+            c1 = C[1]
+            #print("C: {}" .format(C))
+            if (C[0]**2)-3*C[1]*q >= 0 and np.fabs(C[1]) > 10e-10:
+                alphastar = (-(C[0])+ np.sqrt((C[0]**2) - 3*C[1]*q))/(3*C[1])
+            else:
+                alphastar = alpha
+            
+        alphatemp = alpha
+        alpha = max((rholo*alpha),min(alphastar, rhohi*alpha))
+        ftemp = fj
+        fj = fun(x + alpha*d)
+        j = j+1
+        
+    return alpha 
