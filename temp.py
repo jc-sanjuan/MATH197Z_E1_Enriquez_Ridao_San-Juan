@@ -33,9 +33,13 @@ def grad_himmelblau(x):
 		2d vector
 	"""
     dx = np.zeros(100)	
-    for i in range(99):
+    i = 0
+    #for i in range(99):
+    while i < 99:
         dx[i] = 400.0*x[i]**3 - 400.0*x[i]*x[i+1] + 2*x[i] - 2
         dx[i+1] = 200.0*(x[i+1]-x[i]**2)
+        i = i+2
+   
     return dx
 
 
