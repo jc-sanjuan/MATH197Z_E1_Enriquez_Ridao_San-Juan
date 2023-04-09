@@ -62,11 +62,12 @@ def strongWolfe_conditions(fun, d, x, fx, gx, g, c1=1e-4, rho=0.5, alpha_in=1.0,
         j = j+1 
     return alpha
 
+
 def goldstein_conditions(fun, d, x, fx, gx, rho=0.5, alpha_in=1.0, maxback=30):
 	j = 0
 	alpha = alpha_in
 	q = np.dot(gx, d)
-	while fx+0.75*alpha*q>fun(x+alpha*d) or fun(x+alpha*d)>fx+0.25*alpha*q and j<= maxback:
+	while fun(x + alpha*d) > fx + 0.25*alpha*q or (fun(x + alpha*d) >= fx + 0.75*alpha*q and j <= maxback):
 		alpha = rho*alpha
 		j = j+1 
 	return alpha
