@@ -1,11 +1,13 @@
 """
-Pyython Module for Math 197 - numerical Optimization
+Python Module for Math 197 - numerical Optimization
 
 Name: Raphaell Ridao
 2nd Semester AY 2022-2023
 """
 
 import numpy as np 
+from numpy import *
+import math
 
 def armijo_backtrack(fun, d, x, fx, gx, c1=1e-4, rho=0.5, alpha_in=1.0, maxback=30):
 	"""
@@ -42,8 +44,37 @@ def armijo_backtrack(fun, d, x, fx, gx, c1=1e-4, rho=0.5, alpha_in=1.0, maxback=
 
 	return alpha 
 
+def wolfe_conditions(fun, d, x, fx, gx, g, c1=1e-4, rho=0.5, alpha_in=1.0, maxback=30):
+	j = 0
+	alpha = alpha_in
+	q = np.dot(gx, d)
+	while fun(x+alpha*d)>fx+c1*alpha*q or np.dot(g(x + alpha*d), d)<0.9*q and j<= maxback:
+		alpha = rho*alpha
+		j = j+1 
+	return alpha
 
-def steepest_descent(fun, x, gradfun, tol=1e-10, maxit=1000):
+def strongWolfe_conditions(fun, d, x, fx, gx, g, c1=1e-4, rho=0.5, alpha_in=1.0, maxback=30):
+	j = 0
+	alpha = alpha_in
+	q = np.dot(gx, d)
+	while fun(x+alpha*d)>fx+c1*alpha*q or abs(np.dot(g(x + alpha*d), d)>0.9*q) and j<= maxback:
+		alpha = rho*alpha
+		j = j+1 
+	return alpha
+
+def goldstein_conditions(fun, d, x, fx, gx, rho=0.5, alpha_in=1.0, maxback=30):
+	j = 0
+	alpha = alpha_in
+	q = np.dot(gx, d)
+	while fx+0.75*alpha*q>fun(x+alpha*d) or fun(x+alpha*d)>fx+0.25*alpha*q and j<= maxback:
+		alpha = rho*alpha
+		j = j+1 
+	return alpha
+
+def steepest_descent(fun, x, gradfun, tol=1e-10, maxit=50000):
+
+	operator = input("Choose stepsize selection criterion:\n 1. Armijo\n 2. Wolfe\n 3. StrongWolfe\n 4. Goldstein\n Input name: ")
+	print(operator)
 	"""
 	Parameters
 	----------
@@ -68,12 +99,23 @@ def steepest_descent(fun, x, gradfun, tol=1e-10, maxit=1000):
 			it:int
 				number of iteration
 	"""
+
+
+
 	it = 0
 	grad_norm = np.linalg.norm(gradfun(x))
 	while grad_norm>tol and it<=maxit:
 		d = -gradfun(x)
 		fx = fun(x)
-		alpha = armijo_backtrack(fun,d,x,fx,-d)
+		if operator == 'Armijo':
+			alpha = armijo_backtrack(fun,d,x,fx,-d)
+		elif operator == 'Wolfe':
+			alpha = wolfe_conditions(fun,d,x,fx,-d, gradfun)
+		elif operator == 'StrongWolfe':
+			alpha = strongWolfe_conditions(fun,d,x,fx,-d, gradfun)
+		elif operator == 'Goldstein':
+			alpha = goldstein_conditions(fun,d,x,fx,-d)
+
 		x = x + alpha*d
 		grad_norm = np.linalg.norm(gradfun(x))
 		it = it + 1
