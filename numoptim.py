@@ -54,13 +54,14 @@ def wolfe_conditions(fun, d, x, fx, gx, g, c1=1e-4, rho=0.5, alpha_in=1.0, maxba
 	return alpha
 
 def strongWolfe_conditions(fun, d, x, fx, gx, g, c1=1e-4, rho=0.5, alpha_in=1.0, maxback=30):
-	j = 0
-	alpha = alpha_in
-	q = np.dot(gx, d)
-	while fun(x+alpha*d)>fx+c1*alpha*q or abs(np.dot(g(x + alpha*d), d)>0.9*q) and j<= maxback:
-		alpha = rho*alpha
-		j = j+1 
-	return alpha
+    j = 0
+    alpha = alpha_in
+    q = np.dot(gx, d)
+    
+    while fun(x+alpha*d)>fx+c1*alpha*q or abs(np.dot(g(x + alpha*d), d)>0.9*q) and j<= maxback:
+        alpha = rho*alpha
+        j = j+1 
+    return alpha
 
 def goldstein_conditions(fun, d, x, fx, gx, rho=0.5, alpha_in=1.0, maxback=30):
 	j = 0
@@ -160,18 +161,14 @@ def polynomial_armijo(fun, d, x, fx, gx, g, c1=1e-4, rholo=0.1, rhohi=0.5, alpha
     while fj > fx+c1*alpha*q and j <= maxpol:
         
         if j == 0:
-            alphastar = -((q)*alpha**2)/(2*(fj-fx-(alpha*q)))
+            alphastar = ((-q)*alpha**2)/(2*(fj-fx-(alpha*q)))
             
         else:
             A = np.array([[np.float64(alphatemp**2), np.float64(alphatemp**3)],[np.float64(alpha**2), np.float64(alpha**3)]])
             B = np.array([(np.float64(ftemp-fx-(alphatemp*q))),(np.float64(fj-fx-(alpha*q)))])
             
-            #A = np.float64(A)
-            #B = np.float64(B)
-            
             C = np.linalg.solve(A,B)
-            c1 = C[1]
-            #print("C: {}" .format(C))
+            
             if (C[0]**2)-3*C[1]*q >= 0 and np.fabs(C[1]) > 10e-10:
                 alphastar = (-(C[0])+ np.sqrt((C[0]**2) - 3*C[1]*q))/(3*C[1])
             else:
