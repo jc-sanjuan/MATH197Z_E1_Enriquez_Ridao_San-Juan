@@ -22,7 +22,7 @@ def himmelblau(x):
 	return a+b
 
 def grad_himmelblau(x):
-	"""
+    """
 	Parameter
 	---------
 		x:array
@@ -32,15 +32,15 @@ def grad_himmelblau(x):
 	-------
 		2d vector
 	"""
-
-	
-	dx0 = 400.0*x[0]**3 - 400.0*x[0]*x[1] + 2*x[0] - 2
-	dx1 = 200.0*(x[1]-x[0]**2)
-	return np.array([dx0,dx1])
+    dx = np.zeros(100)	
+    for i in range(99):
+        dx[i] = 400.0*x[i]**3 - 400.0*x[i]*x[i+1] + 2*x[i] - 2
+        dx[i+1] = 200.0*(x[i+1]-x[i]**2)
+    return dx
 
 
 if __name__ == "__main__":
-	x = [0.,0.]				#np.array([0.,0.])
+	x = np.zeros(100)			#np.array([0.,0.])
 	x, grad_norm, it = steepest_descent(himmelblau, x, grad_himmelblau)
 	print("Approximate Minimizer: {}" .format(x))
 	print("Gradient Norm 		: {}" .format(grad_norm))
