@@ -1,9 +1,4 @@
-"""
-Python Module for Math 197 - numerical Optimization
 
-Name: Raphaell Ridao
-2nd Semester AY 2022-2023
-"""
 
 import numpy as np 
 from numpy import *
