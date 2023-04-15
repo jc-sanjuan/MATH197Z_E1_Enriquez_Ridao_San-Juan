@@ -49,9 +49,9 @@ def backtracking(fun, d, x, fx, gx, g, ssc, c1=1e-4, rho=0.5, alpha_in=1.0, maxb
     condition = conditions(fun, d, x, fx, gx, g, ssc, c1, rho, alpha, q)
     
     
-    while condition and j<= maxback:
+    while condition and j< maxback:
         alpha = rho*alpha
-        j = j+1 						# j+=1
+        j = j+1
         condition = conditions(fun, d, x, fx, gx, g, ssc, c1, rho, alpha, q)
     return alpha 
 
@@ -84,8 +84,8 @@ def conditions(fun, d, x, fx, gx, g, ssc, c1, rho, alpha, q):
 
 	Returns
 	-------
-		alpha: float
-			steplength satisfying the chosen rule or the last steplength
+		condition: boolean
+			shows if stepsize criterion is satisfied
 	"""
     
     if ssc == 'Armijo' or ssc == '1':
@@ -135,7 +135,7 @@ def steepest_descent(fun, x, gradfun, tol=1e-10, maxit=50000):
 
     it = 0
     grad_norm = np.linalg.norm(gradfun(x))
-    while grad_norm>tol and it<=maxit:
+    while grad_norm>tol and it<maxit:
         d = -gradfun(x)
         fx = fun(x)
         if ssm == 'Backtracking' or ssm == '1':
@@ -193,7 +193,7 @@ def polynomial(fun, d, x, fx, gx, g, ssc, c1=1e-4, rholo=0.1, rhohi=0.5, alpha_i
     alphatemp = alpha
     ftemp = fj
     condition = conditions(fun, d, x, fx, gx, g, ssc, c1, rhohi, alpha, q)
-    while condition and j <= maxpol:
+    while condition and j < maxpol:
         
         if j == 0:
             alphastar = ((-q)*alpha**2)/(2*(fj-fx-(alpha*q)))
@@ -212,7 +212,7 @@ def polynomial(fun, d, x, fx, gx, g, ssc, c1=1e-4, rholo=0.1, rhohi=0.5, alpha_i
         alphatemp = alpha
         alpha = max((rholo*alpha),min(alphastar, rhohi*alpha))
         ftemp = fj
-        #fj = fun(x + alpha*d)
+        fj = fun(x + alpha*d)
         condition = conditions(fun, d, x, fx, gx, g, ssc, c1, rhohi, alpha, q)
         j = j+1
         
