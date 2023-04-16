@@ -51,7 +51,7 @@ def grad_rosenbrock(x):
         i = i+1
     
     dx[i]= 200.0*(x[i]-x[i-1]**2)
-    #dx[i] = 400.0*x[i-1]**3 - 400.0*x[i-1]*x[i] + 2*x[i-1] - 2
+    
     return dx
 
 
