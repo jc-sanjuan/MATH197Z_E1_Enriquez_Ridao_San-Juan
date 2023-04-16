@@ -102,7 +102,7 @@ def conditions(fun, d, x, fx, gx, g, ssc, c1, rho, alpha, q):
     return condition
     
 
-def steepest_descent(fun, x, gradfun, tol=1e-10, maxit=50000):
+def steepest_descent(fun, x, gradfun, tol=1e-6, maxit=50000):
     ssm = input("Choose method:\n 1. Backtracking\n 2. Polynomial Interpolation\n Input name/number: ")
     ssc = input("Choose stepsize selection criterion:\n 1. Armijo\n 2. Wolfe\n 3. StrongWolfe\n 4. Goldstein\n Input name/number: ")
     
@@ -135,7 +135,7 @@ def steepest_descent(fun, x, gradfun, tol=1e-10, maxit=50000):
 
     it = 0
     grad_norm = np.linalg.norm(gradfun(x))
-    while grad_norm>tol and it<maxit:
+    while abs(grad_norm)>=tol and it<maxit:
         d = -gradfun(x)
         fx = fun(x)
         if ssm == 'Backtracking' or ssm == '1':
